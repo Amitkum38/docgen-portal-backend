@@ -1,8 +1,21 @@
 import mongoose from "mongoose";
 
 export async function connectDB() {
-  const uri =
-    process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/digital-document-generator";
-  await mongoose.connect(uri);
-  console.log("MongoDB connected");
+  const uri = process.env.MONGODB_URI;
+
+  if (!uri) {
+    throw new Error("❌ MONGODB_URI is not set.");
+  }
+
+  try {
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+    });
+
+    console.log("✅ MongoDB Connected");
+  } catch (err) {
+    console.error("❌ MongoDB Connection Error:");
+    console.error(err);
+    process.exit(1);
+  }
 }
