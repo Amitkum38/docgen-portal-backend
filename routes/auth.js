@@ -33,10 +33,11 @@ function sessionExpiry() {
 }
 
 function cookieOptions() {
+  const isProd = process.env.NODE_ENV === "production";
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     maxAge: SESSION_DAYS * 24 * 60 * 60 * 1000,
     path: "/",
   };
@@ -123,7 +124,8 @@ router.post("/user/login", async (req, res) => {
 router.post("/logout", async (req, res) => {
   const token = req.cookies?.[COOKIE_NAME];
   if (token) await Session.deleteOne({ token });
-  res.clearCookie(COOKIE_NAME, { path: "/" });
+  const { maxAge: _maxAge, ...clearOpts } = cookieOptions();
+  res.clearCookie(COOKIE_NAME, clearOpts);
   res.json({ ok: true });
 });
 

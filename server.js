@@ -11,6 +11,7 @@ import { connectDB } from "./db.js";
 import authRouter, { seedMasters } from "./routes/auth.js";
 
 const app = express();
+app.set("trust proxy", 1);
 
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || "http://localhost:5173")
   .split(",")
@@ -30,6 +31,11 @@ app.use((req, res, next) => {
 
 app.use(cookieParser());
 app.use(express.json());
+
+app.get("/health", (_req, res) => {
+  res.json({ ok: true });
+});
+
 app.use("/auth", authRouter);
 
 const upload = multer({
