@@ -19,6 +19,19 @@ function redactUri(uri) {
   return uri.replace(/:([^:@/]+)@/, ":***@");
 }
 
+const PLACEHOLDER_URI_PATTERN =
+  /xxxxx|<username>|<password>|<db-user>|<db-password>|<cluster-id>|USERNAME|PASSWORD|your[_-]?cluster|example\.mongodb\.net/i;
+
+function assertRealMongoUri(uri) {
+  if (PLACEHOLDER_URI_PATTERN.test(uri)) {
+    throw new Error(
+      "MONGODB_URI still contains placeholder text (e.g. USERNAME, xxxxx). " +
+        "Set the real connection string from MongoDB Atlas → Database → Connect → Drivers " +
+        "in Render → Environment → MONGODB_URI.",
+    );
+  }
+}
+
 export async function connectDB() {
   const uris = [
     normalizeMongoUri(process.env.MONGODB_URI),
@@ -27,6 +40,10 @@ export async function connectDB() {
 
   if (uris.length === 0) {
     throw new Error("❌ MONGODB_URI is not set.");
+  }
+
+  for (const uri of uris) {
+    assertRealMongoUri(uri);
   }
 
   let lastErr;
