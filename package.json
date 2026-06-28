@@ -1,0 +1,21 @@
+{
+  "name": "mera-kisan-card",
+  "version": "1.0.0",
+  "description": "Upload an Aadhaar card and generate a printable Mera Kisan Card",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.19.2",
+    "mongoose": "^9.7.3",
+    "multer": "^2.2.0",
+    "pdf-to-png-converter": "^3.6.4",
+    "sharp": "^0.33.4",
+    "tesseract.js": "^5.1.0",
+    "zxing-wasm": "^1.2.11"
+  }
+}
