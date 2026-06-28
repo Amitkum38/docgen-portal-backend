@@ -15,10 +15,10 @@ app.set("trust proxy", 1);
 
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || "http://localhost:5173")
   .split(",")
-  .map((s) => s.trim());
+  .map((s) => s.trim().replace(/\/$/, ""));
 
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
+  const origin = req.headers.origin?.replace(/\/$/, "");
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -31,6 +31,15 @@ app.use((req, res, next) => {
 
 app.use(cookieParser());
 app.use(express.json());
+
+app.get("/", (_req, res) => {
+  res.json({
+    ok: true,
+    message: "Digital Document Generator API is running.",
+    frontend: "Open your Vercel frontend app in the browser — this URL is for API only.",
+    endpoints: { health: "/health", auth: "/auth", extract: "POST /extract" },
+  });
+});
 
 app.get("/health", (_req, res) => {
   res.json({ ok: true });
@@ -258,10 +267,6 @@ function parseOcr(text) {
     out.gender = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
   return out;
 }
-
-app.get("/health", (_req, res) => {
-  res.json({ ok: true });
-});
 
 // ---------- main endpoint ----------
 app.post("/extract", upload.single("aadhaar"), async (req, res) => {
